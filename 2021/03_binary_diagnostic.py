@@ -14,9 +14,9 @@ def binary_diagnostic(report: List[int], num_binary_digits: int = 12) -> Diagnos
 
     def bit_value(number: int, index: int) -> int:
         """
-        bit_value returns the bit at the given index.
+        Return the bit at the given index.
 
-        indexing is from left to right, to be consistent
+        Indexing is from left to right, to be consistent
         with the problem description.
 
             bit_value(0b1100, 0) == 1
@@ -30,9 +30,9 @@ def binary_diagnostic(report: List[int], num_binary_digits: int = 12) -> Diagnos
 
     def flip_bit(number: int, index: int) -> int:
         """
-        flip_bit flips the bit at the given index.
+        Flip the bit at the given index.
 
-        indexing is from left to right, to be consistent
+        Indexing is from left to right, to be consistent
         with the problem description.
 
             flip_bit(0b1100, 0) == 0100
@@ -45,10 +45,10 @@ def binary_diagnostic(report: List[int], num_binary_digits: int = 12) -> Diagnos
 
     def bit_frequencies(readings: List[int], index: int) -> Dict[int, int]:
         """
-        bit_frequencies returns a mapping from a binary value to its
-        number of occurances in readings, at the provided binary digit index
+        Return a mapping from a binary value to its
+        number of occurances in readings, at the provided binary digit index.
 
-        indexing is from left to right, to be consistent
+        Indexing is from left to right, to be consistent
         with the problem description.
 
             bit_frequencies([0b10, 0b10, 0b11, 0b11], 0) == {0: 0, 1: 4}
@@ -62,8 +62,8 @@ def binary_diagnostic(report: List[int], num_binary_digits: int = 12) -> Diagnos
 
     def most_common_bit(frequencies: Dict[int, int], tiebreaker: int = 1) -> int:
         """
-        most_common_bit returns the bit that occurs the most, given a frequency map.
-        if there's a tie, return the tiebreaker value
+        Return the bit that occurs the most, given a frequency map.
+        If there's a tie, return the tiebreaker value
 
             most_common_bit({0: 0, 1: 4}) == 1
             most_common_bit({0: 2, 1: 2}) == 1
@@ -75,8 +75,8 @@ def binary_diagnostic(report: List[int], num_binary_digits: int = 12) -> Diagnos
 
     def least_common_bit(frequencies: Dict[int, int], tiebreaker: int = 0) -> int:
         """
-        least_common_bit returns the bit that occurs the least, given a frequency map.
-        if there's a tie, return the tiebreaker value
+        Return the bit that occurs the least, given a frequency map.
+        If there's a tie, return the tiebreaker value.
 
             least_common_bit({0: 0, 1: 4}) == 0
             least_common_bit({0: 2, 1: 2}) == 0
