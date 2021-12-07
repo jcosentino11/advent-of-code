@@ -80,4 +80,4 @@ if __name__ == '__main__':
     lines = [Line.from_input(input) for input in raw_input]
 
     print(f'Part 1 answer: {hydrothermal_venture(lines)}')
-    print(f'Part 2 answer: {hydrothermal_venture(lines)}')
+    #print(f'Part 2 answer: {hydrothermal_venture(lines)}')
