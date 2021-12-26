@@ -1,6 +1,8 @@
 from __future__ import annotations
-from typing import List, Optional
+from abc import abstractmethod
+from typing import Dict, List, Optional
 from util import get_input
+from dataclasses import dataclass
 
 
 class Lanternfish:
@@ -23,26 +25,54 @@ class Lanternfish:
         self._timer -= 1
 
 
+@dataclass
+class SimulationConfiguration:
+    "Starting population of lanternfish"
+    starting_population: List[Lanternfish]
+    "Whether verbose logging is enabled"
+    verbose: bool = False
+
+
 class LanternfishSimulation:
 
-    def __init__(self,
-                 starting_population: List[Lanternfish],
-                 days: int,
-                 verbose: bool = False) -> None:
-        "Current population of lanternfish"
-        self._population: List[Lanternfish] = starting_population
-        "Number of days to simulate"
-        self._days: int = days
-        "Current number of days left in the simulation"
-        self._days_left: int = days
-        "Whether verbose logging is enabled"
-        self._verbose: bool = verbose
+    def __init__(self, conf: SimulationConfiguration) -> None:
+        self.conf = conf
+        "How long the simulation has run so far"
+        self.days_elapsed: int = 0
 
-    def complete(self) -> bool:
+    @abstractmethod
+    def population_size(self) -> int:
         """
-        True if there are no more days left in the simulation
+        Returns the size of the current population
         """
-        return self._days_left == 0
+        pass
+
+    def next_day(self) -> None:
+        """
+        Run the next day of simulation for the entire population of fish
+        """
+        self._next_day()
+        self.days_elapsed += 1
+
+    @abstractmethod
+    def _next_day(self) -> None:
+        pass
+
+
+class NaiveSimulation(LanternfishSimulation):
+    """
+    Naive approach.
+
+    Represent all lanternfish timers as list. Each day,
+    iterate through the whole population and append newly spawned
+    fish to the list.  This approach isn't great because list
+    grows very large as the simulation progresses.
+    """
+
+    def __init__(self, conf: SimulationConfiguration) -> None:
+        super().__init__(conf)
+        "Current population of lanternfish"
+        self._population: List[Lanternfish] = conf.starting_population
 
     def population_size(self) -> int:
         """
@@ -50,16 +80,7 @@ class LanternfishSimulation:
         """
         return len(self._population)
 
-    def next_day(self) -> None:
-        """
-        Run the next day of simulation for the entire population of fish
-        """
-        self._next_day_naive()
-
-    def _next_day_naive(self) -> None:
-        if self.complete():
-            return
-
+    def _next_day(self):
         new_fish = []
 
         for fish in self._population:
@@ -68,26 +89,20 @@ class LanternfishSimulation:
                 new_fish.append(spawned_fish)
 
         self._population.extend(new_fish)
-        self._days_left -= 1
 
-        if self._verbose:
+        if self.conf.verbose:
             print(
-                f'After {self._days - self._days_left} day(s): {",".join([str(fish._timer) for fish in self._population])}')
-
-    def _next_day_optimized(self) -> None:
-        # TODO the naive implementation doesn't work for problem 2, come up with a better way
-        pass
+                f'After {self.days_elapsed + 1} day(s): {",".join([str(fish._timer) for fish in self._population])}')
 
 
-def get_lanternfish_count(starting_population: List[Lanternfish], days: int) -> int:
-    simulation = LanternfishSimulation(
-        starting_population=starting_population,
-        days=days,
-        # verbose=True
-    )
-    while not simulation.complete():
+def get_lanternfish_counts(simulation: LanternfishSimulation, days: List[int]) -> Dict[int, int]:
+    days = sorted(days)
+    counts = {}
+    for day in range(1, days[-1] + 1):
         simulation.next_day()
-    return simulation.population_size()
+        if day in days:
+            counts[day] = simulation.population_size()
+    return counts
 
 
 if __name__ == '__main__':
@@ -95,7 +110,14 @@ if __name__ == '__main__':
     starting_population = [Lanternfish(int(timer))
                            for timer in raw_input[0].split(",")]
 
+    conf = SimulationConfiguration(
+        starting_population=starting_population,
+        # verbose=True
+    )
+
+    simulation = NaiveSimulation(conf)
+
+    counts = get_lanternfish_counts(simulation, days=[80])
+
     print(
-        f'Part 1 answer: {get_lanternfish_count(starting_population=starting_population, days=80)}')
-    # print(
-    #     f'Part 2 answer: {get_lanternfish_count(starting_population=starting_population, days=256)}')
+        f'Part 1 answer: {counts[80]}')
