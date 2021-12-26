@@ -95,6 +95,39 @@ class NaiveSimulation(LanternfishSimulation):
                 f'After {self.days_elapsed + 1} day(s): {",".join([str(fish._timer) for fish in self._population])}')
 
 
+class OptimizedSimulation(LanternfishSimulation):
+    """
+    Optimized approach.
+
+    Represent lanternfish as list of timer value frequencies.
+    This approach is bounded by the number of possible timer values, rather
+    than the size of the lanternfish population, making it much more performant
+    over the naive approach.
+    """
+
+    MAX_NUM_TIMER_VALUES = 9
+
+    def __init__(self, conf: SimulationConfiguration) -> None:
+        super().__init__(conf)
+        "Current population of lanternfish"
+        self._population: List[int] = [0] * \
+            OptimizedSimulation.MAX_NUM_TIMER_VALUES
+        for fish in conf.starting_population:
+            self._population[fish._timer] += 1
+
+    def population_size(self) -> int:
+        """
+        Returns the size of the current population
+        """
+        return sum(self._population)
+
+    def _next_day(self):
+        num_expired_timers = self._population[0]
+        self._population.pop(0)
+        self._population[6] += num_expired_timers
+        self._population.append(num_expired_timers)
+
+
 def get_lanternfish_counts(simulation: LanternfishSimulation, days: List[int]) -> Dict[int, int]:
     days = sorted(days)
     counts = {}
@@ -115,9 +148,12 @@ if __name__ == '__main__':
         # verbose=True
     )
 
-    simulation = NaiveSimulation(conf)
+    # simulation = NaiveSimulation(conf)
+    simulation = OptimizedSimulation(conf)
 
-    counts = get_lanternfish_counts(simulation, days=[80])
+    population_at_day = get_lanternfish_counts(simulation, days=[80, 256])
 
     print(
-        f'Part 1 answer: {counts[80]}')
+        f'Part 1 answer: {population_at_day[80]}')
+    print(
+        f'Part 2 answer: {population_at_day[256]}')
