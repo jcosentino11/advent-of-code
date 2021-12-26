@@ -123,8 +123,11 @@ class OptimizedSimulation(LanternfishSimulation):
 
     def _next_day(self):
         num_expired_timers = self._population[0]
+        # decrement timer values 
         self._population.pop(0)
+        # expired timers reset at value 6
         self._population[6] += num_expired_timers
+        # new fish are spwaned with timer value 8
         self._population.append(num_expired_timers)
 
 
