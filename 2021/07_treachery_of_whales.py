@@ -1,29 +1,55 @@
-from typing import List
+from typing import Callable, List
 from util import get_input
 
 
-def calculate_min_alignment_fuel(crab_positions: List[int]) -> int:
-    min_position = min(crab_positions)
-    max_position = max(crab_positions)
+def calculate_min_fuel(
+        positions: List[int],
+        cost: Callable[[int], int] = lambda x: x) -> int:
+    """
+    Calculate the minimum amount of fuel needed to align all the crabs.
 
-    min_fuel_cost = (max_position - min_position) * len(crab_positions)
+    Parameters
+    ----------
+    positions: List[int]
+        List of horizontal crab positions
+    cost: Callable[[int], int]
+        Function that computes cost, given number of horizontal crab moves as input.
+        By default, cost is equal to number of crab moves.
+    """
 
-    for alignment_position in range(min_position, max_position + 1):
-        fuel_cost = 0
-        for position in crab_positions:
-            fuel_cost += abs(alignment_position - position)
-            if fuel_cost > min_fuel_cost:
-                break
+    def alignment_cost(target_pos: int) -> int:
+        return sum([cost(abs(target_pos - position)) for position in positions])
 
-        if fuel_cost < min_fuel_cost:
-            min_fuel_cost = fuel_cost
-
-    return min_fuel_cost
+    return min([alignment_cost(position) for position in range(min(positions), max(positions) + 1)])
 
 
 if __name__ == '__main__':
     raw_input = get_input(year=2021, day=7)
-    crab_positions = [int(position) for position in raw_input[0].split(",")]
+    positions = [int(position) for position in raw_input[0].split(",")]
+
+    def increasing_cost(steps: int) -> int:
+        """
+        Given a total number of crab steps, calculate the cost.
+        Cost increases by 1 for each crab, with initial cost being 1.
+
+        Essentially, this function just sums integers from 1 to steps, inclusive.
+
+        Parameters
+        ----------
+        steps: int
+            number of crab steps
+
+        Examples
+        --------
+
+        increasing_cost(1) == 1
+        increasing_cost(2) == 3
+        increasing_cost(3) == 6
+
+        """
+        return int(steps * (steps + 1) / 2)
 
     print(
-        f'Part 1 answer: {calculate_min_alignment_fuel(crab_positions)}')
+        f'Part 1 answer: {calculate_min_fuel(positions)}')
+    print(
+        f'Part 2 answer: {calculate_min_fuel(positions, cost=increasing_cost)}')
